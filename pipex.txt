@@ -1,0 +1,27 @@
+Toujours attendre que les child processes soient finis avant de finir le parent process, sinon la memoire allouée
+aux child processes ne sera pas free et il y aura des memory leaks
+
+When creating multiple processes (ie multiple calls to the fork function), always do it in the parent process,
+or else the number of child processes created will grow exponentially (2^n processes total for n calls to fork(),
+when not done in the parent process only)
+
+We cannot have a pipe that both sends a receives data ON THE SAME PROCESS : we need to have at least two pipes in that case
+
+Compute len of an array of integers : len - sizeof(array) / sizeof(int). sizeof(array) gives the number of bytes used
+by the array in memory. To get the number of int, we divide it by the size of an int, ie sizeof(int)
+
+
+int waitstatus;
+wait(&waitstatus);
+-> allows to test if 
+    -   the code in the program terminated on its own, ie was executed normally : 
+            if (WIFEXITED(waitstatus)) returns sthg != 0, then the program terminated itself normally
+    -   if (WIFEXITED(waitstatus))
+        {
+            int status_code = WEXITSTATUS(waitstatus); // the return value inside the main, or the value the program exited with.
+            if (status_code == 0) // program was executed properly
+            else // permet de traiter le cas ou le programme ne s'est pas executé comme prévu
+        }
+
+
+execv executes an executable file, not a bash script

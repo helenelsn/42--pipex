@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 20:06:49 by hlesny            #+#    #+#             */
-/*   Updated: 2023/03/30 20:18:13 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/01 03:09:34 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,15 @@
 #include <sys/types.h> // for pid_t data type
 #include <sys/wait.h> // for wait()
 #include <fcntl.h>
+#include <errno.h>
 
-typedef struct  s_cmd
+
+typedef struct  s_command
 {
     char            *path;
-    char            *args[]; // ne pass oublier de NULL-terminate le tableau de pointeurq
-    int             pid; // initialisé à -1. Sert à savoir à quel process est assigné chaque commande (?) 
-    struct s_elem   *next:
-}               t_cmd;
+    char            **args; // ne pass oublier de NULL-terminate le tableau de pointeurq
+    struct s_cmd   *next;
+}               t_command;
 
 
 /* pipe : chainer des processus de maniere a ce que la sortie d'un processus 
