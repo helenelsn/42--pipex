@@ -3,43 +3,39 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/03 20:04:03 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/05 20:47:42 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*join_strings(char *string1, char *string2, int free1)
+char	*add_command(char *path, char *command)
 {
 	int		len1;
     int     len2;
 	char	*tmp;
 	int		i;
 
-	
 	i = -1;
-	len1 = ft_strlen(string1);
-	len2 = ft_strlen(string2);
-	tmp = malloc(sizeof(char) * (len1 + len2 + 1));
+	len1 = ft_strlen(path);
+	len2 = ft_strlen(command);
+	tmp = malloc(sizeof(char) * (len1 + len2 + 2));
 	if (!tmp)
 		return (NULL);
 	while (++i < len1)
-		tmp[i] = string1[i];
+		tmp[i] = path[i];
+    tmp[++i] = '/';
 	i = -1;
 	while (++i < len2)
-		tmp[len1 + i] = string2[i];
+		tmp[len1 + i] = command[i];
 	tmp[len1 + i] = '\0';
-    if (!free1)
-        free(string2);
-    else
-	    free(string1);
 	return (tmp);
 }
 
-char *strsearch(char *string, char *to_find)
+int strsearch(char *string, char *to_find) // détermine si string commence par to_find
 {
     int i;
 
@@ -47,20 +43,20 @@ char *strsearch(char *string, char *to_find)
     while (string[i] && to_find[i])
     {
         if (string[i] != to_find[i])
-            return (NULL);
-        i++;
+            return (0);
+        i++;    
     }
-    return ();
+    if (to_find[i]) // n'est pas sorti du while parce qu'est arrivé au bout de to_find
+        return (0);
+    return (1);
 }
-
-int 
 
 t_command *new_elem()
 {
     
 }
 
-void    get_path(char *command, char **envp)
+char *    get_path(char *command, char **envp)
 {
     int i;
     int j;
@@ -68,57 +64,68 @@ void    get_path(char *command, char **envp)
     char **paths;
 
     i = 0;
-    while (envp[i])
-    {
-        path = strsearch(envp[i], "PATH=");
-        if (path)
-            break;
-    }
-    path = join_strings("./:", path, 1); // ./ est un chemin relatif : est-ce qu'access() gere ce genre de chemin ?
+    j = 0;
+    while (envp[i] && !strsearch(envp[i], "PATH="))
+        i++;
+    path = ft_strjoin(".:", envp[i] + 5); // ./ est un chemin relatif : est-ce qu'access() gere ce genre de chemin ?
     if (!path)
         return ;
     paths = ft_split(path, ':');
+    
     i = 0;
     while (paths[i])
     {
         free(path);
-        path = join_strings(paths[i], command);
+        path = add_command(paths[i], command);
         if (!access(path, X_OK)) // on success, 0 is returned
-        {
-            
-        }
-    }   
+            return (free_tab(paths), path);
+    }
+    return (free_tab(paths), NULL); // si aucun path n'est valide
+}
+
+void    free_commands(char ***) // char *** ou char **** ?
+{
+    
 }
 
 // get the commands' binary's absolute paths (env | grep PATH)
-t_command    *set_commands(int argc, char **argv, char **envp) // chaque argv[i] correspond a une commande
+char ***set_commands(int argc, char **argv, char **envp) // chaque argv[i] correspond a une commande
 {
-    t_command *current;
+    char ***commands;
     char **command;
-    char **args;
     int i;
     int j;
     
-    i = 2;
-    current = new_elem;
+    // a juste besoin d'un tableau de commandes, ie d'un tableau de char ** (un char *** donc)
+    
+    i = 0;
+    commands = malloc(sizeof(char **) * (argc + 1));
+    if (!commands)
+        retunr (NULL);
     while (i < argc)
     {
         command = ft_split(argv[i], ' ');
         if (!command)
             return (strerror("Error : split\n"), 1);
-        current->path = get_path(command[0], envp);
-        j = 1;
-        while (command[j])
+            j = 0;
+        commands[i][j] = get_path(command[j], envp);
+        if (!commands[i][j])
+            return (free_commands(commands), free_tab(command), NULL);
+        while (command[++j])
         {
-            
+            if (!commands[i][j])
+                return (free_commands(commands), free_tab(command), NULL);
+            commands[i][j] = ft_strdup(command[j]);
         }
-        
+        free_tab(command);
     }
+    commands[i] = NULL;
+    return (commands);
 }
 
 int main(int argc, char **argv, char **envp)
 {
-    t_command *current;
+    char ***commands;
     
     int pipes_nb;
     int processes_nb;
@@ -131,8 +138,8 @@ int main(int argc, char **argv, char **envp)
     int wstatus;
 
     //current = NULL;
-    current = set_commands(argc - 1, argv, envp);
-    if (!current)
+    commands = set_commands(argc - 1, argv, envp);
+    if (!commands)
         return (4);
     
     pipes_nb = argc - 2;
@@ -148,7 +155,7 @@ int main(int argc, char **argv, char **envp)
         i++;
     }
     i = 0;
-    while (i < processes_nb && current)
+    while (i < processes_nb && commands[i])
     {
         pid[i] = fork();
         if (pid[i] == -1)
