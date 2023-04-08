@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/08 18:35:48 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/08 19:52:02 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,37 @@ char ***set_commands(int argc, char **argv, char **envp) // chaque argv[i] corre
     return (commands);
 }
 
+/*
+
+"<" est utilisé pour rediriger l'entrée standard à partir d'un fichier ou d'un autre flux, 
+tandis que "<<" est utilisé pour rediriger l'entrée standard à partir d'une chaîne de caractères 
+délimitée par une autre chaîne.
+
+----------------------------------------------------------------------------
+
+cmd > file : écrase le contenu existant
+cmd >> file : écrit à la suite du fichier
+
+">" est utilisé pour écrire la sortie standard d'une commande dans un fichier, 
+en remplaçant son contenu existant s'il y en a, 
+tandis que ">>" est utilisé pour ajouter la sortie standard d'une commande à la fin d'un fichier, 
+sans effacer son contenu existant.
+
+*/
+
+void    manage_here_doc()
+{
+    char *line;
+    
+    line = get_next_line(STDIN_FILENO);
+    while (line) // && condition sur la présence de "LIMITER" dans line
+    {
+        free(line);
+        line = get_next_line(STDIN_FILENO);
+    }
+    
+}
+
 int main(int argc, char **argv, char **envp)
 {
     char ***commands;
@@ -162,7 +193,9 @@ int main(int argc, char **argv, char **envp)
     int i;
     int j;
     int wstatus;
+    int here_doc;
 
+    here_doc = strsearch(argv[1], "here_doc");
     commands = set_commands(argc - 1, argv, envp);
     if (!commands)
         return (4);
@@ -177,7 +210,10 @@ int main(int argc, char **argv, char **envp)
         return(perror("open "), 4);
     in_out[1] = open(argv[argc - 1], O_WRONLY, O_CREAT);
     if (in_out[1] == -1)
+    {
+        close(in_out[0]);
         return(perror("open "), 4);
+    }
     
     while (i < pipes_nb)
     {
