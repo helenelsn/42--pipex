@@ -6,14 +6,14 @@
 #    By: Helene <Helene@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/07 19:48:12 by Helene            #+#    #+#              #
-#    Updated: 2023/04/07 21:27:57 by Helene           ###   ########.fr        #
+#    Updated: 2023/04/08 20:55:39 by Helene           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
-CC = cc
+CC = gcc
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror -g3
+CFLAGS = -g3 #-fsanitize=address 
 
 LIBFTDIR = ./mylibft
 LIBFT = ./mylibft/libft.a

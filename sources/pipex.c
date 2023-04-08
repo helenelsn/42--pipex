@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/08 19:52:02 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/08 21:01:39 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int strsearch(char *string, char *to_find) // détermine si string commence par 
     return (1);
 }
 
-size_t get_path(char *command, char **envp, char ***commands, int j)
+char *get_path(char *command, char **envp)
 {
     int i;
     char *path;
@@ -87,7 +87,7 @@ size_t get_path(char *command, char **envp, char ***commands, int j)
         i++;
     path = ft_strjoin(".:", envp[i] + 5); // ./ est un chemin relatif : est-ce qu'access() gere ce genre de chemin ?
     if (!path)
-        return (0);
+        return (NULL);
     paths = ft_split(path, ':');
     
     i = 0;
@@ -96,44 +96,40 @@ size_t get_path(char *command, char **envp, char ***commands, int j)
         free(path);
         path = add_command(paths[i], command);
         //printf("path = %s\n", path);
-        if (!access(path, X_OK)) // on success, 0 is returned
+        if (!access(path, F_OK) && !access(path, X_OK)) // on success, 0 is returned
         {
-            *commands[j] = ft_strdup(path);
-            free(path);
-            return (ft_strlen(*commands[j])); // free_tab(&paths);
+            return (path);
         }
         i++;
     }
-    
-    
-    return (free_tab(&paths), free(path), 0); // si aucun path n'est valide
+    return (free_tab(&paths), free(path), NULL); // si aucun path n'est valide
 }
 
 // get the commands' binary's absolute paths (env | grep PATH)
 char ***set_commands(int argc, char **argv, char **envp) // chaque argv[i] correspond a une commande
 {
     char ***commands;
-    char **command;
     int i;
     int j;
     
-    i = 2; // 0 = a.out et 1 = infile
-    commands = malloc(sizeof(char **) * (argc - 1));
+    i = 0; // 0 = a.out et 1 = infile
+    commands = malloc(sizeof(char **) * (argc + 1));
     if (!commands)
         return (NULL);
     while (i < argc)
     {
-        command = ft_split(argv[i], ' '); // command is null-terminated
-        if (!command)
+        commands[i] = ft_split(argv[i], ' '); // command is null-terminated
+        if (!commands[i])
             return (perror("Error (tried to get the right path) "), NULL);
-        j = 0;
+       /* j = 0;
         while (command[j])
             j++;
         commands[i] = malloc(sizeof(char *) * (j + 1));
         if (!commands[i])
-            return (NULL);
+            return (NULL); */
         j = 0;
-        get_path(command[j], envp, &commands[i], j);
+        commands[i][0] = get_path(commands[i][0], envp);
+        /*
         if (!commands[i][j])
             return (free_commands(&commands), free_tab(&command), NULL);
         while (command[++j])
@@ -141,11 +137,13 @@ char ***set_commands(int argc, char **argv, char **envp) // chaque argv[i] corre
             commands[i][j] = ft_strdup(command[j]); // rajoute les options de la commande i
             if (!commands[i][j])
                 return (free_commands(&commands), free_tab(&command), NULL);
-        }
+        }*/
         //free_tab(&command);
         i++;
+        printf("hello\n");
     }
     commands[i] = NULL;
+    printf("%s\n", commands[0][0]);
     return (commands);
 }
 
@@ -167,6 +165,7 @@ sans effacer son contenu existant.
 
 */
 
+/*
 void    manage_here_doc()
 {
     char *line;
@@ -179,6 +178,7 @@ void    manage_here_doc()
     }
     
 }
+*/
 
 int main(int argc, char **argv, char **envp)
 {
@@ -193,10 +193,10 @@ int main(int argc, char **argv, char **envp)
     int i;
     int j;
     int wstatus;
-    int here_doc;
+    //int here_doc;
 
-    here_doc = strsearch(argv[1], "here_doc");
-    commands = set_commands(argc - 1, argv, envp);
+    //here_doc = strsearch(argv[1], "here_doc");
+    commands = set_commands(argc - 3, argv + 2, envp);
     if (!commands)
         return (4);
     
