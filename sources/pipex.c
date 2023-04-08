@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/08 21:01:39 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/08 23:15:22 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,6 @@ char ***set_commands(int argc, char **argv, char **envp) // chaque argv[i] corre
         printf("hello\n");
     }
     commands[i] = NULL;
-    printf("%s\n", commands[0][0]);
     return (commands);
 }
 
@@ -203,8 +202,8 @@ int main(int argc, char **argv, char **envp)
     pipes_nb = argc - 2;
     processes_nb = argc - 3; 
     i = 0;
-    if (access(argv[1], F_OK | R_OK) == -1) // l'infile n'existe pas, ou ne peut pas etre lu
-        return(4);
+   // if (access(argv[1], F_OK | R_OK) == -1) // l'infile n'existe pas, ou ne peut pas etre lu
+     //   return(4);
     in_out[0] = open(argv[1], O_RDONLY);
     if (in_out[0] == -1)
         return(perror("open "), 4);
@@ -222,6 +221,7 @@ int main(int argc, char **argv, char **envp)
         i++;
     }
     i = 0;
+    perror("deb\n");
     while (i < processes_nb && commands[i])
     {
         pid[i] = fork();
@@ -229,34 +229,62 @@ int main(int argc, char **argv, char **envp)
             return (perror("fork "), 2);
         if (pid[i] == 0) // child process
         {
+            
             j = 0;
+            
             while (j < pipes_nb)
             {
-                printf("ici\n");
+                //printf("ici %d\n", i);
+                int fd;
                 if (j == i)
                 {
                     if (j == 0) // doit alors lire depuis d'infile donné en argument
-                        dup2(in_out[0], STDIN_FILENO);
+                    {
+                        close(pipefd[j][0]);
+                        fd  = in_out[0];
+                    }
                     else
-                        dup2(pipefd[j][0], STDIN_FILENO);
+                    {
+                        close(in_out[0]);
+                        fd = pipefd[j][0];
+                    }
+                    close(pipefd[j][1]);
+                    dup2(fd , STDIN_FILENO);
+                    close(fd);
                 }
-                if (j == i + 1)
+                else if (j == i + 1)
                 {
                     if (j == pipes_nb - 1) // doit alors écrire sur l'outfile donné en argument
-                        dup2(in_out[1], STDOUT_FILENO);
+                    {
+                        close(pipefd[j][1]);
+                        fd = in_out[1];
+                    }
                     else
-                        dup2(pipefd[j][1], STDOUT_FILENO);
+                    {
+                        close(in_out[1]);
+                        fd = pipefd[j][1];
+                    }
+                    close(pipefd[j][0]);
+                    dup2(fd, STDOUT_FILENO);
+                    close(fd);
                 }
-                if (close(pipefd[j][0]) == -1)
+                /* else
+                {
+                    close()
+                } */
+              /*   if (close(pipefd[j][0]) == -1)
                     perror("close ");
                 if (close(pipefd[j][1]) == -1)
-                    perror("close ");
+                    perror("close "); */
                 j++;
             }
+            printf("i = %d \n my pid is %d\n", i, pid[i]);
             if (execve(commands[i][0], commands[i], envp) == -1)
                 return (perror("execve "), 3);
-            return (0); // we only want to fork in the parent process ; we therefore terminate each child process after they executed their assignated command, or else they would stay in the while loop and create child processes of their own as well
+            exit(0); // we only want to fork in the parent process ; we therefore terminate each child process after they executed their assignated command, or else they would stay in the while loop and create child processes of their own as well
+            
         }
+        //printf("parent \n i = %d \n my pid is %ld\n", i, pid[i]);
         i++;
     }
     if (close(in_out[0]) == -1)
@@ -266,11 +294,15 @@ int main(int argc, char **argv, char **envp)
     i = 0;
     while (i < processes_nb)
     {
+        waitpid(pid[i], &wstatus, 0);
+        /*
         if (waitpid(pid[i], &wstatus, 0) == -1)
             perror("waitpid ");
         if (! WIFEXITED(wstatus))
             perror("child process terminated anormally ");
+        */
         i++;
     }
+    perror("e ici\n");
     return (0); 
 }
