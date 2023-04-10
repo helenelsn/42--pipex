@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+         #
+#    By: Helene <Helene@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/07 19:48:12 by Helene            #+#    #+#              #
-#    Updated: 2023/04/08 22:08:02 by hlesny           ###   ########.fr        #
+#    Updated: 2023/04/09 21:33:34 by Helene           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,10 +24,12 @@ SRCSDIR = ./sources/
 INCSDIR = ./includes/
 OBJSDIR = ./objs/
 
-INC_FILES = pipex.h
+INC_FILES = pipex.h get_next_line.h
 INCS = $(addprefix $(INCSDIR), $(INC_FILES))
 
-SRCS = pipex.c 
+SRCS = 	pipex2.c \
+		get_next_line.c get_next_line_utils.c
+		
 OBJS = $(addprefix $(OBJSDIR), $(SRCS:.c=.o))
 
 export C_INCLUDE_PATH = $(INCSDIR):$(LIBFTDIR)

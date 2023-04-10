@@ -5,7 +5,7 @@ When creating multiple processes (ie multiple calls to the fork function), alway
 or else the number of child processes created will grow exponentially (2^n processes total for n calls to fork(),
 when not done in the parent process only)
 
-We cannot have a pipe that both sends a receives data ON THE SAME PROCESS : we need to have at least two pipes in that case
+We cannot have a pipe that both sends and receives data ON THE SAME PROCESS : we need to have at least two pipes in that case
 
 Compute len of an array of integers : len - sizeof(array) / sizeof(int). sizeof(array) gives the number of bytes used
 by the array in memory. To get the number of int, we divide it by the size of an int, ie sizeof(int)

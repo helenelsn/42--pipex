@@ -6,6 +6,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(lldb) Lancer",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/pipex",
+            "args": ["infile", "grepp a", "wc -l", "outfile"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
