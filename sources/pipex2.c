@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/12 23:15:13 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/14 16:58:51 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,26 @@
 
 char	*get_next_line(int fd);
 
-void    free_tab(char **command)
+void    free_tab(char **tab)
 {
     int i;
 
     i = 0;
-    while (command[i])
+    while (tab[i])
     {
-        free(command[i]);
+        free(tab[i]);
+        tab[i] = NULL; // ?
         i++;
     }
+    free(tab);
 }
 
-void    free_commands(char ***commands) // char *** ou char **** ?
+/*
+{ {"/usr/bin/grep", "a", NULL},
+    {"/usr/bin/ls", "-la", NULL},
+    {NULL} };
+*/
+void    free_commands(char ***commands)
 {
     int i;
 
@@ -34,8 +41,11 @@ void    free_commands(char ***commands) // char *** ou char **** ?
     while (commands[i])
     {
         free_tab(commands[i]);
+        commands[i] = NULL;
         i++;
     }
+    free(commands);
+    commands = NULL;
 }
 
 // add the command string to the path string
@@ -100,7 +110,7 @@ char *get_path(char *command, char **envp)
         //printf("path = %s\n", path);
         if (!access(path, F_OK) && !access(path, X_OK)) // on success, 0 is returned
         {
-            return (path);
+            return (free_tab(paths), path);
         }
         i++;
     }
@@ -114,7 +124,7 @@ char ***set_commands(int argc, char **argv, char **envp) // chaque argv[i] corre
     int i;
     int j;
     
-    i = 0; // 0 = a.out et 1 = infile
+    i = 0;
     commands = malloc(sizeof(char **) * (argc + 1));
     if (!commands)
         return (NULL);
@@ -179,13 +189,16 @@ int contains_limiter(char *line, char *limiter) // returns -1 if line doesn't co
     while (line[i])
     {
         j = 0;
-        while (line[i] != limiter[j])
+        while (line[i] && line[i] != limiter[j])
             i++;
         k = i;
-        while (line[k] == limiter[j])
+        while (line[k] && line[k] == limiter[j])
             (k++, j++);
         if (!limiter[j]) // ie si est sorti du while en ayant entièrement parcouru limiter
             return (i);
+        if (line[i])
+            i++;
+        //fprintf(stderr, "i = %d, line[i] = %c\n", i, line[i]);
     }
     return (-1);
 }
@@ -201,7 +214,7 @@ int test_here_doc(char *arg1, char *limiter)
     if (!strsearch(arg1, "here_doc"))
         return (-1);
     
-    infile = open("pipex_infile", O_CREAT | O_RDWR | O_APPEND, S_IRUSR | S_IWUSR); 
+    infile = open("pipex_infile", O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR); 
     if (infile == -1)
     {
         perror("open");
@@ -210,17 +223,21 @@ int test_here_doc(char *arg1, char *limiter)
     line = get_next_line(STDIN_FILENO);
     while (line && contains_limiter(line, limiter) == -1)
     {
+        //fprintf(stderr, "contains_limiter = %d\n", contains_limiter(line, limiter));
         ft_putstr_fd(line, infile);
         free(line);
         line = get_next_line(STDIN_FILENO);
     }
     i = -1;
     j = contains_limiter(line, limiter);
+    //fprintf(stderr, "contains_limiter = %d\n", j);
     if (line && j >= 0) // ie est sorti du while car est tombé sur le limiter
     {
         while (++i < j)
             ft_putchar_fd(line[i], infile);
         free(line);
+        //dup2(infile, STDIN_FILENO);
+        //close(infile);
         return (infile);
     }
     close(infile);
@@ -247,7 +264,7 @@ int main(int argc, char **argv, char **envp)
         return (5);
     }
     
-    here_doc = test_here_doc(argv[1], argv[2]);
+    here_doc = test_here_doc(argv[1], argv[2]); // gerer le cas ou ecrit uniquement le limiter sur stdin (ie l'infile est vide)
     
     if (here_doc == -1)
     {
@@ -262,6 +279,8 @@ int main(int argc, char **argv, char **envp)
             close(in_out[0]);
             return(perror("open "), 4);
         }
+        /* dup2(in_out[0], STDIN_FILENO);
+        close(in_out[0]); */
     }
     else
     {
@@ -273,16 +292,16 @@ int main(int argc, char **argv, char **envp)
             return(perror("open "), 4);
         }
     }
-    printf("here doc = %d\n", here_doc);
-    commands = set_commands(argc - 3, argv + 2 + (here_doc > -1), envp);
+    dup2(in_out[0], STDIN_FILENO);
+    close(in_out[0]);
+    dup2(in_out[1], STDOUT_FILENO);
+    close(in_out[1]);
+    fprintf(stderr, "here doc = %d\n", here_doc);
+    commands = set_commands(argc - 3 - (here_doc > -1), argv + 2 + (here_doc > -1), envp);
     if (!commands)
-        return (perror("Error while setting commands' paths"), 4);
+        return (perror("set_commands "), 4);
     processes_nb = argc - 3 - (here_doc > -1); 
     i = 0;
-    dup2(in_out[0], STDIN_FILENO);
-    dup2(in_out[1], STDOUT_FILENO);
-    close(in_out[0]);
-    close(in_out[1]);
     
     while (i < processes_nb && commands[i])
     {
@@ -348,6 +367,7 @@ int main(int argc, char **argv, char **envp)
         fprintf(stderr, "done waiting for child %d\n", i);
         i++;
     }
-    sleep(10);
+    sleep(1);
+    free_commands(commands);
     return (WIFEXITED(wstatus) & WEXITSTATUS(wstatus)); 
 }
