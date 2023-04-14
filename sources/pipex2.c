@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/10 21:00:10 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/12 23:15:13 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,9 +169,25 @@ void    read_input(int fd)
     free(line);
 }
 
-int contains_limiter(char *string, char *limiter)
+int contains_limiter(char *line, char *limiter) // returns -1 if line doesn't contain it, and the index of the limiter in line if it does
 {
-    return (0);
+    int i;
+    int j;
+    int k;
+
+    i = 0;
+    while (line[i])
+    {
+        j = 0;
+        while (line[i] != limiter[j])
+            i++;
+        k = i;
+        while (line[k] == limiter[j])
+            (k++, j++);
+        if (!limiter[j]) // ie si est sorti du while en ayant entièrement parcouru limiter
+            return (i);
+    }
+    return (-1);
 }
 
 // returns >= 0 (the infile fd) in case of success, -1 in case of failure or nonexistence of here_doc argument
@@ -179,6 +195,8 @@ int test_here_doc(char *arg1, char *limiter)
 {
     char *line;
     int infile;
+    int i;
+    int j;
     
     if (!strsearch(arg1, "here_doc"))
         return (-1);
@@ -190,18 +208,23 @@ int test_here_doc(char *arg1, char *limiter)
         exit(-1); // ? 
     }
     line = get_next_line(STDIN_FILENO);
-    while (line && !contains_limiter(line, limiter)) // && condition sur la présence de "LIMITER" dans line
+    while (line && contains_limiter(line, limiter) == -1)
     {
         ft_putstr_fd(line, infile);
         free(line);
         line = get_next_line(STDIN_FILENO);
     }
-    if (line) // ie est sorti du while car est tombé sur le limiter
+    i = -1;
+    j = contains_limiter(line, limiter);
+    if (line && j >= 0) // ie est sorti du while car est tombé sur le limiter
     {
-        
+        while (++i < j)
+            ft_putchar_fd(line[i], infile);
         free(line);
+        return (infile);
     }
-    return (infile);
+    close(infile);
+    return (-1); // si a aucun moment 
 }
 
 int main(int argc, char **argv, char **envp)
@@ -250,10 +273,11 @@ int main(int argc, char **argv, char **envp)
             return(perror("open "), 4);
         }
     }
-    commands = set_commands(argc - 3, argv + 2, envp);
+    printf("here doc = %d\n", here_doc);
+    commands = set_commands(argc - 3, argv + 2 + (here_doc > -1), envp);
     if (!commands)
         return (perror("Error while setting commands' paths"), 4);
-    processes_nb = argc - 3; 
+    processes_nb = argc - 3 - (here_doc > -1); 
     i = 0;
     dup2(in_out[0], STDIN_FILENO);
     dup2(in_out[1], STDOUT_FILENO);
@@ -305,27 +329,9 @@ int main(int argc, char **argv, char **envp)
             exit(0); // we only want to fork in the parent process ; we therefore terminate each child process after they executed their assignated command, or else they would stay in the while loop and create child processes of their own as well
             
         }
-        // else
-        // {
-        //     //fprintf(stderr, "i = %d, my pid is %d, my child's pid is %d\n", i, getpid(), pid[i]);
-        //     //prev_pipe = pipefd[0];
-        //     if (close(pipefd[0]) == -1)
-        //         perror("close cc1");
-        //     if (close(pipefd[1]) == -1)
-        //         perror("close cc2");
-        // }
-        //printf("parent \n i = %d \n my pid is %ld\n", i, pid[i]);
         i++;
     }
     i = 0;
-    //close(pipefd[0]);
-    //close(pipefd[1]);
-    /*
-    if (close(in_out[0]) == -1)
-        perror("close");
-    if (close(in_out[1]) == -1)
-        perror("close");
-    */
    if (close(pipefd[0]) == -1)
         perror("close");
     if (close(pipefd[1]) == -1)
