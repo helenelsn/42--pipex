@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 20:06:49 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/07 20:53:27 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/14 17:12:44 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <stdio.h> // for perror()
 
 #include "libft.h"
+#include "get_next_line.h"
 
 typedef struct  s_command
 {
@@ -29,6 +30,8 @@ typedef struct  s_command
     struct s_cmd   *next;
 }               t_command;
 
+int     test_here_doc(char *arg1, char *limiter);
+char    ***set_commands(int argc, char **argv, char **envp);
 
 /* pipe : chainer des processus de maniere a ce que la sortie d'un processus 
 alimente directement l'entree du suivant 

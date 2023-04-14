@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex2.c                                           :+:      :+:    :+:   */
+/*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/14 16:58:51 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/14 17:10:57 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ void    free_tab(char **tab)
     while (tab[i])
     {
         free(tab[i]);
-        tab[i] = NULL; // ?
         i++;
     }
     free(tab);
@@ -41,107 +40,9 @@ void    free_commands(char ***commands)
     while (commands[i])
     {
         free_tab(commands[i]);
-        commands[i] = NULL;
         i++;
     }
     free(commands);
-    commands = NULL;
-}
-
-// add the command string to the path string
-char	*add_command(char *path, char *command)
-{
-	int		len1;
-    int     len2;
-	char	*tmp;
-	int		i;
-
-	i = -1;
-    len1 = ft_strlen(path);
-	len2 = ft_strlen(command);
-	tmp = malloc(sizeof(char) * (len1 + len2 + 2));
-	if (!tmp)
-		return (NULL);
-	while (++i < len1)
-		tmp[i] = path[i];
-    tmp[i] = '/';
-	i = -1;
-	while (++i < len2)
-		tmp[len1 + i + 1] = command[i];
-	tmp[len1 + i + 1] = '\0';
-	return (tmp);
-}
-
-int strsearch(char *string, char *to_find) // détermine si string commence par to_find
-{
-    int i;
-
-    i = 0;
-    while (string[i] && to_find[i])
-    {
-        if (string[i] != to_find[i])
-            return (0);
-        i++;    
-    }
-    if (to_find[i]) // n'est pas sorti du while parce qu'est arrivé au bout de to_find
-        return (0);
-    return (1);
-}
-
-char *get_path(char *command, char **envp)
-{
-    int i;
-    char *path;
-    char **paths;
-
-    i = 0;
-    while (envp[i] && !strsearch(envp[i], "PATH="))
-        i++;
-    path = ft_strjoin(".:", envp[i] + 5); // ./ est un chemin relatif : est-ce qu'access() gere ce genre de chemin ?
-    if (!path)
-        return (NULL);
-    paths = ft_split(path, ':');
-    
-    i = 0;
-    while (paths[i])
-    {
-        free(path);
-        path = add_command(paths[i], command);
-        //printf("path = %s\n", path);
-        if (!access(path, F_OK) && !access(path, X_OK)) // on success, 0 is returned
-        {
-            return (free_tab(paths), path);
-        }
-        i++;
-    }
-    return (free_tab(paths), free(path), NULL); // si aucun path n'est valide
-}
-
-// get the commands' binary's absolute paths (env | grep PATH)
-char ***set_commands(int argc, char **argv, char **envp) // chaque argv[i] correspond a une commande
-{
-    char ***commands;
-    int i;
-    int j;
-    
-    i = 0;
-    commands = malloc(sizeof(char **) * (argc + 1));
-    if (!commands)
-        return (NULL);
-    while (i < argc)
-    {
-        commands[i] = ft_split(argv[i], ' '); // command is null-terminated
-        if (!commands[i])
-            return (perror("set_command() "), NULL);
-        j = 0;
-        commands[i][0] = get_path(commands[i][0], envp);
-        if (!commands[i][0]) // ie si le binaire n'existe pas ou n'est pas executable
-            return(free_commands(commands), NULL);
-        i++;
-        //printf("setting command %d...\n", i);
-    }
-    commands[i] = NULL;
-    return (commands);
 }
 
 /*
@@ -161,88 +62,6 @@ tandis que ">>" est utilisé pour ajouter la sortie standard d'une commande à l
 sans effacer son contenu existant.
 
 */
-
-
-void    read_input(int fd)
-{
-    char *line;
-
-    printf("fd = %d\n", fd);
-    line = get_next_line(fd);
-    while (line)
-    {
-        printf("%s", line);
-        free(line);
-        line = get_next_line(fd);
-    }
-    printf("\n");
-    free(line);
-}
-
-int contains_limiter(char *line, char *limiter) // returns -1 if line doesn't contain it, and the index of the limiter in line if it does
-{
-    int i;
-    int j;
-    int k;
-
-    i = 0;
-    while (line[i])
-    {
-        j = 0;
-        while (line[i] && line[i] != limiter[j])
-            i++;
-        k = i;
-        while (line[k] && line[k] == limiter[j])
-            (k++, j++);
-        if (!limiter[j]) // ie si est sorti du while en ayant entièrement parcouru limiter
-            return (i);
-        if (line[i])
-            i++;
-        //fprintf(stderr, "i = %d, line[i] = %c\n", i, line[i]);
-    }
-    return (-1);
-}
-
-// returns >= 0 (the infile fd) in case of success, -1 in case of failure or nonexistence of here_doc argument
-int test_here_doc(char *arg1, char *limiter)
-{
-    char *line;
-    int infile;
-    int i;
-    int j;
-    
-    if (!strsearch(arg1, "here_doc"))
-        return (-1);
-    
-    infile = open("pipex_infile", O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR); 
-    if (infile == -1)
-    {
-        perror("open");
-        exit(-1); // ? 
-    }
-    line = get_next_line(STDIN_FILENO);
-    while (line && contains_limiter(line, limiter) == -1)
-    {
-        //fprintf(stderr, "contains_limiter = %d\n", contains_limiter(line, limiter));
-        ft_putstr_fd(line, infile);
-        free(line);
-        line = get_next_line(STDIN_FILENO);
-    }
-    i = -1;
-    j = contains_limiter(line, limiter);
-    //fprintf(stderr, "contains_limiter = %d\n", j);
-    if (line && j >= 0) // ie est sorti du while car est tombé sur le limiter
-    {
-        while (++i < j)
-            ft_putchar_fd(line[i], infile);
-        free(line);
-        //dup2(infile, STDIN_FILENO);
-        //close(infile);
-        return (infile);
-    }
-    close(infile);
-    return (-1); // si a aucun moment 
-}
 
 int main(int argc, char **argv, char **envp)
 {

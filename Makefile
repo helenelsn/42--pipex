@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: Helene <Helene@student.42.fr>              +#+  +:+       +#+         #
+#    By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/07 19:48:12 by Helene            #+#    #+#              #
-#    Updated: 2023/04/09 21:33:34 by Helene           ###   ########.fr        #
+#    Updated: 2023/04/14 17:12:04 by hlesny           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ OBJSDIR = ./objs/
 INC_FILES = pipex.h get_next_line.h
 INCS = $(addprefix $(INCSDIR), $(INC_FILES))
 
-SRCS = 	pipex2.c \
+SRCS = 	pipex.c set_execve_args.c pipex_bonus.c \
 		get_next_line.c get_next_line_utils.c
 		
 OBJS = $(addprefix $(OBJSDIR), $(SRCS:.c=.o))
