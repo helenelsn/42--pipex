@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 19:17:36 by hlesny            #+#    #+#             */
-/*   Updated: 2023/02/05 18:29:34 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/14 21:20:00 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 # endif
 
 char	*get_next_line(int fd);
-int		ft_strlen(char *str);
-char	*ft_substr(char *str, int len);
+int		ft_gnl_strlen(char *str);
+char	*ft_gnl_substr(char *str, int len);
 char	*ft_strncat(char *line, char *buffer, int len);
 
 #endif

@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 19:05:22 by hlesny            #+#    #+#             */
-/*   Updated: 2023/02/28 22:07:18 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/14 21:20:12 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int		ft_strlen(char *str)
+int		ft_gnl_strlen(char *str)
 {
 	int	i;
 
@@ -24,7 +24,7 @@ int		ft_strlen(char *str)
 	return (i);
 }
 
-char	*ft_substr(char *str, int len)
+char	*ft_gnl_substr(char *str, int len)
 {
 	int		i;
 	char	*substring;
@@ -49,9 +49,9 @@ char	*ft_strncat(char *line, char *buffer, int len)
 	int		i;
 
 	if (!len)
-		len = ft_strlen(buffer); // pour pouvoir l'utiliser dans get_coordinates()
+		len = ft_gnl_strlen(buffer); // pour pouvoir l'utiliser dans get_coordinates()
 	i = -1;
-	l_len = ft_strlen(line);
+	l_len = ft_gnl_strlen(line);
 	tmp = malloc(sizeof(char) * (l_len + len + 1));
 	if (!tmp)
 		return (NULL);

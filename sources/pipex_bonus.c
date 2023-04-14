@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:07:03 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/14 17:07:39 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/14 21:27:11 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ int test_here_doc(char *arg1, char *limiter)
         while (++i < j)
             ft_putchar_fd(line[i], infile);
         free(line);
-        //dup2(infile, STDIN_FILENO);
-        //close(infile);
+        dup2(infile, STDIN_FILENO);
+        close(infile);
         return (infile);
     }
     close(infile);

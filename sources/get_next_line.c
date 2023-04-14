@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 19:00:54 by hlesny            #+#    #+#             */
-/*   Updated: 2023/02/28 22:07:10 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/14 21:18:35 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static char	*get_line(int fd, char *buffer, char *line, int index_n)
 {
 	int	bytes_read;
 
-	bytes_read = ft_strlen(buffer);
+	bytes_read = ft_gnl_strlen(buffer);
 	line = ft_strncat(line, buffer, index_n + 1);
 	if (!line)
 		return (NULL);

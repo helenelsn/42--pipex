@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/14 17:10:57 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/14 21:27:30 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,12 +98,12 @@ int main(int argc, char **argv, char **envp)
             close(in_out[0]);
             return(perror("open "), 4);
         }
-        /* dup2(in_out[0], STDIN_FILENO);
-        close(in_out[0]); */
+        dup2(in_out[0], STDIN_FILENO);
+        close(in_out[0]);
     }
     else
     {
-        in_out[0] = here_doc; // re vérifier si est bien >= 0 ? 
+        //in_out[0] = here_doc; // re vérifier si est bien >= 0 ? 
         in_out[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, S_IRWXU);
         if (in_out[1] == -1)
         {
@@ -111,8 +111,8 @@ int main(int argc, char **argv, char **envp)
             return(perror("open "), 4);
         }
     }
-    dup2(in_out[0], STDIN_FILENO);
-    close(in_out[0]);
+    // dup2(in_out[0], STDIN_FILENO);
+    // close(in_out[0]);
     dup2(in_out[1], STDOUT_FILENO);
     close(in_out[1]);
     fprintf(stderr, "here doc = %d\n", here_doc);
