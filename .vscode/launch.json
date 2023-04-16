@@ -22,7 +22,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/pipex",
-            "args": ["infile", "grep a", "wc -l", "outfile"],
+            "args": ["here_doc", "stop", "grep a", "wc -l", "outfile"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

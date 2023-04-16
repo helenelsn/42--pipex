@@ -6,7 +6,7 @@
 /*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/11 04:33:10 by hlesny            #+#    #+#             */
-/*   Updated: 2022/11/12 04:12:41 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/16 18:15:33 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,5 +15,6 @@
 
 void	ft_putchar_fd(char s, int fd)
 {
-	write(fd, &s, 1);
+	if (write(fd, &s, 1) == -1)
+		perror("putchar_fd : write");
 }

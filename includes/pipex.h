@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 20:06:49 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/14 21:22:32 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/16 18:32:31 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 //     struct s_cmd   *next;
 // }               t_command;
 
-int     test_here_doc(char *arg1, char *limiter);
+int     test_here_doc(char *arg1, char *limiter, int *in);
 char    ***set_commands(int argc, char **argv, char **envp);
 void    free_commands(char ***commands);
 void    free_tab(char **tab);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/16 17:05:15 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/16 18:36:02 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 //char	*get_next_line(int fd);
 
-void    read_input(int fd)
+void    read_input(int fd) // fd est deja ouvert dans la fonction qui appelle read_input : ne doit pas le reouvrir ici, si ?
 {
     char *line;
 
-    printf("fd = %d\n", fd);
     line = get_next_line(fd);
     while (line)
     {
@@ -99,7 +98,7 @@ int main(int argc, char **argv, char **envp)
         return (5);
     }
     
-    here_doc = test_here_doc(argv[1], argv[2]); // gerer le cas ou ecrit uniquement le limiter sur stdin (ie l'infile est vide)
+    here_doc = test_here_doc(argv[1], argv[2], &in_out[0]); // gerer le cas ou ecrit uniquement le limiter sur stdin (ie l'infile est vide)
     
     if (here_doc == -1)
     {
@@ -112,6 +111,8 @@ int main(int argc, char **argv, char **envp)
         if (in_out[1] == -1)
         {
             close(in_out[0]);
+            unlink(argv[1]);
+            unlink(argv[argc - 1]);
             return(perror("open "), 4);
         }
         dup2(in_out[0], STDIN_FILENO);
@@ -119,16 +120,18 @@ int main(int argc, char **argv, char **envp)
     }
     else
     {
-        //in_out[0] = here_doc; // re vérifier si est bien >= 0 ? 
+        //in_out[0] = here_doc;
         in_out[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, S_IRWXU);
         if (in_out[1] == -1)
         {
             close(in_out[0]);
+            unlink("here_doc_infile");
+            unlink(argv[argc - 1]);
             return(perror("open "), 4);
         }
     }
-    // dup2(in_out[0], STDIN_FILENO);
-    // close(in_out[0]);
+    dup2(in_out[0], STDIN_FILENO);
+    close(in_out[0]);
     dup2(in_out[1], STDOUT_FILENO);
     close(in_out[1]);
     fprintf(stderr, "here doc = %d\n", here_doc);
@@ -146,7 +149,7 @@ int main(int argc, char **argv, char **envp)
             {
                 dup2(pipefd[0], STDIN_FILENO);
                 close(pipefd[0]);
-                close(pipefd[1]); // ?
+                close(pipefd[1]);
             }
             if (pipe(pipefd) == -1) // pipefd[0] -- read // pipefd[1] : write
                 return (perror("pipe"), 2);   

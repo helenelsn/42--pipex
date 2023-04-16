@@ -6,7 +6,7 @@
 #    By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/07 19:48:12 by Helene            #+#    #+#              #
-#    Updated: 2023/04/14 17:12:04 by hlesny           ###   ########.fr        #
+#    Updated: 2023/04/16 18:19:35 by hlesny           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,10 +35,11 @@ OBJS = $(addprefix $(OBJSDIR), $(SRCS:.c=.o))
 export C_INCLUDE_PATH = $(INCSDIR):$(LIBFTDIR)
 export LIBRARY_PATH = $(LIBFTDIR)
 
-all : $(LIBS) $(NAME)
+all : $(LIBS) $(NAME) # !!!!!!! modifier un fichier de la libft n'est pas detecte (nothing to make for all quand retape make)
 
 $(NAME) : $(OBJS)
-	$(CC) -o $@ $^ $(LIBFT)
+	$(CC) -no-pie -o $@ $^ $(LIBFT) 
+# enlever le -no-pie ?
 
 $(OBJSDIR)%.o: $(SRCSDIR)%.c $(INCS)
 	mkdir -p $(OBJSDIR)

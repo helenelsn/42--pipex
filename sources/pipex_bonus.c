@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:07:03 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/16 17:05:42 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/16 18:36:16 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int contains_limiter(char *line, char *limiter) // returns -1 if line doesn't co
 }
 
 // returns >= 0 (the infile fd) in case of success, -1 in case of failure or nonexistence of here_doc argument
-int test_here_doc(char *arg1, char *limiter)
+int test_here_doc(char *arg1, char *limiter, int *in)
 {
     char *line;
     int infile;
@@ -49,7 +49,7 @@ int test_here_doc(char *arg1, char *limiter)
     if (!strsearch(arg1, "here_doc"))
         return (-1);
     
-    infile = open("pipex_infile", O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR); 
+    infile = open("here_doc_infile", O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR); 
     if (infile == -1)
     {
         perror("open");
@@ -71,11 +71,22 @@ int test_here_doc(char *arg1, char *limiter)
         while (++i < j)
             ft_putchar_fd(line[i], infile);
         free(line);
-        read_input(infile);
-        dup2(infile, STDIN_FILENO);
+        //read_input(infile);
+       /*  line = get_next_line(infile);
+        while (line)
+        {
+            fprintf(stderr, "coucou. %s", line);
+            free(line);
+            line = get_next_line(infile);
+        }
+        fprintf(stderr, "\n");
+        free(line);
+     */
+        //dup2(infile, STDIN_FILENO);
         close(infile);
+        *in = open("here_doc_infile", O_CREAT | O_RDONLY, S_IRUSR | S_IWUSR);
         return (infile);
     }
     close(infile);
-    return (-1); // si a aucun moment 
+    return (-1);
 }

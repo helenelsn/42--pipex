@@ -6,7 +6,7 @@
 /*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/12 04:13:05 by hlesny            #+#    #+#             */
-/*   Updated: 2022/11/13 01:47:32 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/16 18:10:59 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ void	ft_putstr_fd(char *s, int fd)
 	i = 0;
 	while (s[i])
 	{
-		write(fd, &s[i], 1);
+		if (write(fd, &s[i], 1) == -1)
+			perror("putstr : write");
 		i++;
 	}
 }
