@@ -6,13 +6,29 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/14 21:27:30 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/16 17:05:15 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*get_next_line(int fd);
+//char	*get_next_line(int fd);
+
+void    read_input(int fd)
+{
+    char *line;
+
+    printf("fd = %d\n", fd);
+    line = get_next_line(fd);
+    while (line)
+    {
+        fprintf(stderr, "%s", line);
+        free(line);
+        line = get_next_line(fd);
+    }
+    fprintf(stderr, "\n");
+    free(line);
+}
 
 void    free_tab(char **tab)
 {

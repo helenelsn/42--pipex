@@ -6,11 +6,13 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:07:03 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/14 21:27:11 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/16 17:05:42 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+void    read_input(int fd);
 
 int contains_limiter(char *line, char *limiter) // returns -1 if line doesn't contain it, and the index of the limiter in line if it does
 {
@@ -69,6 +71,7 @@ int test_here_doc(char *arg1, char *limiter)
         while (++i < j)
             ft_putchar_fd(line[i], infile);
         free(line);
+        read_input(infile);
         dup2(infile, STDIN_FILENO);
         close(infile);
         return (infile);
