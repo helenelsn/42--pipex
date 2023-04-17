@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/16 18:36:02 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/17 17:28:48 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ sans effacer son contenu existant.
 */
 
 int main(int argc, char **argv, char **envp)
-{
+{   
     char ***commands;
     
     int processes_nb;
@@ -103,10 +103,10 @@ int main(int argc, char **argv, char **envp)
     if (here_doc == -1)
     {
         if (access(argv[1], F_OK | R_OK) == -1) // l'infile n'existe pas, ou ne peut pas etre lu
-            return(perror("access"), 4);
+            return(perror("access"), 5);
         in_out[0] = open(argv[1], O_RDONLY);
         if (in_out[0] == -1)
-            return(perror("open "), 4);   
+            return(perror("open "), 4);
         in_out[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
         if (in_out[1] == -1)
         {
@@ -115,8 +115,8 @@ int main(int argc, char **argv, char **envp)
             unlink(argv[argc - 1]);
             return(perror("open "), 4);
         }
-        dup2(in_out[0], STDIN_FILENO);
-        close(in_out[0]);
+        // dup2(in_out[0], STDIN_FILENO);
+        // close(in_out[0]);
     }
     else
     {
@@ -134,15 +134,17 @@ int main(int argc, char **argv, char **envp)
     close(in_out[0]);
     dup2(in_out[1], STDOUT_FILENO);
     close(in_out[1]);
-    fprintf(stderr, "here doc = %d\n", here_doc);
+    //fprintf(stderr, "here doc = %d\n", here_doc);
     commands = set_commands(argc - 3 - (here_doc > -1), argv + 2 + (here_doc > -1), envp);
-    if (!commands)
-        return (perror("set_commands "), 4);
+    // if (!commands)
+    //     return (perror("set_commands "), 4); 
     processes_nb = argc - 3 - (here_doc > -1); 
     i = 0;
     
-    while (i < processes_nb && commands[i])
+    while (i < processes_nb)
     {
+        // for (int j = 0; commands[i] != NULL && commands[i][j] != NULL; j++)
+        //     printf("commands[%d][%d] = %s\n", i, j, commands[i][j]);
         if (i < processes_nb - 1)
         {
             if (i)
@@ -152,7 +154,7 @@ int main(int argc, char **argv, char **envp)
                 close(pipefd[1]);
             }
             if (pipe(pipefd) == -1) // pipefd[0] -- read // pipefd[1] : write
-                return (perror("pipe"), 2);   
+                return (perror("pipe"), 1);   
         }
         //printf("ok, i = %d\n", i);
         pid[i] = fork();
@@ -180,16 +182,16 @@ int main(int argc, char **argv, char **envp)
                 close(pipefd[1]);
                 close(pipefd[0]); //?
             }
-            fprintf(stderr, "i = %d, my pid is %d, my parent is %d\n", i, getpid(), getppid());
+            //fprintf(stderr, "i = %d, my pid is %d, my parent is %d\n", i, getpid(), getppid());
             if (execve(commands[i][0], commands[i], envp) == -1)
-                return (perror("execve "), 3);
+                return (fprintf(stderr, "command = %s\n", commands[i][0]), free_commands(commands), perror("execve "), 3);
             exit(0); // we only want to fork in the parent process ; we therefore terminate each child process after they executed their assignated command, or else they would stay in the while loop and create child processes of their own as well
             
         }
         i++;
     }
     i = 0;
-   if (close(pipefd[0]) == -1)
+    if (close(pipefd[0]) == -1)
         perror("close");
     if (close(pipefd[1]) == -1)
         perror("close");

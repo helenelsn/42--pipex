@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   set_commands.c                                     :+:      :+:    :+:   */
+/*   set_execve_args.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:08:18 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/14 17:09:54 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/17 17:19:31 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,34 +71,38 @@ char *get_path(char *command, char **envp)
         free(path);
         path = add_command(paths[i], command);
         if (!access(path, F_OK) && !access(path, X_OK)) // on success, 0 is returned
-            return (free_tab(paths), path);
+            return (free_tab(paths), free(command), path);
         i++;
     }
-    return (free_tab(paths), free(path), NULL); // si aucun path n'est valide
+    return (free_tab(paths), free(path), command); // si aucun path n'est valide
 }
 
 // get the commands' binary's absolute paths (env | grep PATH)
-char ***set_commands(int argc, char **argv, char **envp) // chaque argv[i] correspond a une commande
+char ***set_commands(int cmds_count, char **cmds, char **envp) // chaque cmds[i] correspond a une commande
 {
     char ***commands;
     int i;
     int j;
     
     i = 0;
-    commands = malloc(sizeof(char **) * (argc + 1));
+    commands = malloc(sizeof(char **) * (cmds_count + 1));
     if (!commands)
         return (NULL);
-    while (i < argc)
+    while (i < cmds_count)
     {
-        commands[i] = ft_split(argv[i], ' '); // command is null-terminated
-        if (!commands[i])
-            return (perror("set_command() "), NULL);
-        j = 0;
-        commands[i][0] = get_path(commands[i][0], envp);
-        if (!commands[i][0]) // ie si le binaire n'existe pas ou n'est pas executable
-            return(free_commands(commands), NULL);
+        if (cmds[i])
+        {  
+            commands[i] = ft_split(cmds[i], ' '); // command is null-terminated
+            if (!commands[i])
+                return (perror("ft_split "), free_commands(commands), NULL);
+            j = 0;
+            commands[i][0] = get_path(commands[i][0], envp);
+        }
+        else
+            commands[i] = NULL;
+        // if (!commands[i][0]) // ie si le binaire n'existe pas ou n'est pas executable
+        //     return(free_commands(commands), NULL);
         i++;
-        //printf("setting command %d...\n", i);
     }
     commands[i] = NULL;
     return (commands);

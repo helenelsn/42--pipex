@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:07:03 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/16 18:36:16 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/17 14:42:15 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,26 +65,15 @@ int test_here_doc(char *arg1, char *limiter, int *in)
     }
     i = -1;
     j = contains_limiter(line, limiter);
-    //fprintf(stderr, "contains_limiter = %d\n", j);
     if (line && j >= 0) // ie est sorti du while car est tombé sur le limiter
     {
         while (++i < j)
             ft_putchar_fd(line[i], infile);
         free(line);
-        //read_input(infile);
-       /*  line = get_next_line(infile);
-        while (line)
-        {
-            fprintf(stderr, "coucou. %s", line);
-            free(line);
-            line = get_next_line(infile);
-        }
-        fprintf(stderr, "\n");
-        free(line);
-     */
         //dup2(infile, STDIN_FILENO);
         close(infile);
         *in = open("here_doc_infile", O_CREAT | O_RDONLY, S_IRUSR | S_IWUSR);
+        //*in = infile;
         return (infile);
     }
     close(infile);

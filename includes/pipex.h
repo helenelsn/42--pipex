@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
+/*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 20:06:49 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/16 18:32:31 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/17 15:51:17 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 // }               t_command;
 
 int     test_here_doc(char *arg1, char *limiter, int *in);
-char    ***set_commands(int argc, char **argv, char **envp);
+char    ***set_commands(int cmds_count, char **cmds, char **envp);
 void    free_commands(char ***commands);
 void    free_tab(char **tab);
 int     strsearch(char *string, char *to_find);
