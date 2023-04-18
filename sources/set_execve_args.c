@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:08:18 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/17 17:19:31 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/19 01:46:59 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,6 @@ char ***set_commands(int cmds_count, char **cmds, char **envp) // chaque cmds[i]
         }
         else
             commands[i] = NULL;
-        // if (!commands[i][0]) // ie si le binaire n'existe pas ou n'est pas executable
-        //     return(free_commands(commands), NULL);
         i++;
     }
     commands[i] = NULL;

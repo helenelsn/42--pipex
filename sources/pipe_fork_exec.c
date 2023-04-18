@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   pipe_fork_exec.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/18 23:05:29 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/19 01:46:05 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,6 @@ void    open_pipe(t_fork_data *data, int i)
 
 void    child_process(char **envp, t_fork_data *data, int i)
 {
-    // if (i == 0) // we want to read from the infile rather than from pipefd[0]
-    // {
-    //     close(pipefd[0]);
-    //     dup2(pipefd[1], STDOUT_FILENO);
-    //     close(pipefd[1]);
-    // }
     if (i == data->processes_nb - 1) // we want to write in the outfile, rather than in pipefd[1]
     {
         close(data->pipefd[1]);
