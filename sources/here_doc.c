@@ -1,18 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_bonus.c                                      :+:      :+:    :+:   */
+/*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:07:03 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/17 14:42:15 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/18 23:29:08 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-void    read_input(int fd);
 
 int contains_limiter(char *line, char *limiter) // returns -1 if line doesn't contain it, and the index of the limiter in line if it does
 {
@@ -33,12 +31,35 @@ int contains_limiter(char *line, char *limiter) // returns -1 if line doesn't co
             return (i);
         if (line[i])
             i++;
-        //fprintf(stderr, "i = %d, line[i] = %c\n", i, line[i]);
     }
     return (-1);
 }
+int     get_input(char *limiter, int *in, int infile)
+{
+    char *line;
+    int i;
+    int j;
+    
+    line = get_next_line(STDIN_FILENO);
+    while (line && contains_limiter(line, limiter) == -1)
+    {
+        ft_putstr_fd(line, infile);
+        free(line);
+        line = get_next_line(STDIN_FILENO);
+    }
+    i = -1;
+    j = contains_limiter(line, limiter);
+    if (line && j >= 0) // ie est sorti du while car est tombé sur le limiter
+    {
+        free(line);
+        close(infile);
+        *in = open("here_doc", O_CREAT | O_RDONLY, S_IRUSR | S_IWUSR);
+        return (infile);
+    }
+    close(infile);
+    return (-1);
+}
 
-// returns >= 0 (the infile fd) in case of success, -1 in case of failure or nonexistence of here_doc argument
 int test_here_doc(char *arg1, char *limiter, int *in)
 {
     char *line;
@@ -49,33 +70,48 @@ int test_here_doc(char *arg1, char *limiter, int *in)
     if (!strsearch(arg1, "here_doc"))
         return (-1);
     
-    infile = open("here_doc_infile", O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR); 
+    infile = open("here_doc", O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR); 
     if (infile == -1)
     {
         perror("open");
         exit(-1); // ? 
     }
-    line = get_next_line(STDIN_FILENO);
-    while (line && contains_limiter(line, limiter) == -1)
+    return (get_input(limiter, in, infile));
+}
+
+void    here_doc_case(t_fork_data *data, char **argv, int last)
+{
+    data->in_out[1] = open(argv[last], O_WRONLY | O_CREAT | O_APPEND, S_IRWXU);
+    if (data->in_out[1] == -1)
     {
-        //fprintf(stderr, "contains_limiter = %d\n", contains_limiter(line, limiter));
-        ft_putstr_fd(line, infile);
-        free(line);
-        line = get_next_line(STDIN_FILENO);
+        perror("open ");
+        f_close(data->in_out[0]);
+        unlink("here_doc");
+        unlink(argv[last]);
+        exit(4);
     }
-    i = -1;
-    j = contains_limiter(line, limiter);
-    if (line && j >= 0) // ie est sorti du while car est tombé sur le limiter
+}
+
+void    no_here_doc_case(t_fork_data *data, char **argv, int last)
+{
+    if (access(argv[1], F_OK | R_OK) == -1) // l'infile n'existe pas, ou ne peut pas etre lu
     {
-        while (++i < j)
-            ft_putchar_fd(line[i], infile);
-        free(line);
-        //dup2(infile, STDIN_FILENO);
-        close(infile);
-        *in = open("here_doc_infile", O_CREAT | O_RDONLY, S_IRUSR | S_IWUSR);
-        //*in = infile;
-        return (infile);
+        perror("access");
+        exit(5);
     }
-    close(infile);
-    return (-1);
+    data->in_out[0] = open(argv[1], O_RDONLY);
+    if (data->in_out[0] == -1)
+    {
+        perror("open ");
+        exit(4);
+    }
+    data->in_out[1] = open(argv[last], O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+    if (data->in_out[1] == -1)
+    {
+        perror("open ");
+        f_close(data->in_out[0]);
+        unlink(argv[1]);
+        unlink(argv[last]);
+        exit(4);
+    }
 }

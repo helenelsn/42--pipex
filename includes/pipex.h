@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 20:06:49 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/17 15:51:17 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/18 23:12:01 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,24 @@
 #include "libft.h"
 #include "get_next_line.h"
 
-// typedef struct  s_command
-// {
-//     char            *path;
-//     char            **args; // ne pass oublier de NULL-terminate le tableau de pointeurq
-//     struct s_cmd   *next;
-// }               t_command;
+typedef struct  s_fork_data
+{
+    char ***commands; 
+    int pipefd[2];
+    int in_out[2];
+    int wstatus;
+    int processes_nb;
+}               t_fork_data;
 
-int     test_here_doc(char *arg1, char *limiter, int *in);
 char    ***set_commands(int cmds_count, char **cmds, char **envp);
+int     strsearch(char *string, char *to_find);
+void    initialise_data(t_fork_data *data, char **argv, int last);
+void    open_pipe(t_fork_data *data, int i);
+void    pipe_fork_exec(t_fork_data *data, char **envp, int pids_nb);
+void    child_process(char **envp, t_fork_data *data, int i);
+void    f_close(int fd);
 void    free_commands(char ***commands);
 void    free_tab(char **tab);
-int     strsearch(char *string, char *to_find);
 
 /* pipe : chainer des processus de maniere a ce que la sortie d'un processus 
 alimente directement l'entree du suivant 
@@ -48,7 +54,5 @@ Pipes are unidirectional : data flows through the pipeline from left to right
 Each process must close the end(s) of the pipe that it will not be using
 before producing or consuming any data
 */
-
-
 
 #endif
