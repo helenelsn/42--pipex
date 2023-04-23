@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 23:04:25 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/18 23:05:33 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/20 23:14:56 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,36 +15,44 @@
 void     f_close(int fd)
 {
     if (fd < 0)
-        exit(6);
+        exit(EXIT_FAILURE);
     if (close(fd) == -1)
     {
         perror("close ");
-        exit(7); // exit maintenant ? 
+        exit(EXIT_FAILURE); // exit maintenant ? 
     }
 }
 
-void    free_tab(char **tab)
+int     f2_close(int fd)
 {
-    int i;
-
-    i = 0;
-    while (tab[i])
+    if (fd < 0)
+        return(EXIT_FAILURE);
+    if (close(fd) == -1)
     {
-        free(tab[i]);
-        i++;
+        perror("close ");
+        return(EXIT_FAILURE);
     }
-    free(tab);
+    return (EXIT_SUCCESS);
 }
 
-void    free_commands(char ***commands)
+void    f_dup2(int fd1, int fd2)
 {
-    int i;
-
-    i = 0;
-    while (commands[i])
+    if (fd1 < 0 || fd2 < 0)
+        exit(EXIT_FAILURE);
+    if (dup2(fd1, fd2) == -1)
     {
-        free_tab(commands[i]);
-        i++;
+        perror("dup2 ");
+        exit(EXIT_FAILURE);
     }
-    free(commands);
 }
+
+// void    close_c(int fd) // i
+// {
+//     if (fd < 0)
+//         return (EXIT_FAILURE);
+//     if (close(fd) == -1)
+//     {
+//         perror("close ");
+//         return (EXIT_FAILURE);
+//     }
+// }

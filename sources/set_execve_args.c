@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:08:18 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/19 01:46:59 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/23 17:34:53 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ char *get_path(char *command, char **envp)
     i = 0;
     while (envp[i] && !strsearch(envp[i], "PATH="))
         i++;
+    if (!envp[i])
+        return (ft_putstr_fd("Error : No PATH variable\n", STDERR_FILENO), command);
     path = ft_strjoin(".:", envp[i] + 5); // ./ est un chemin relatif : est-ce qu'access() gere ce genre de chemin ?
     if (!path)
         return (NULL);
@@ -82,7 +84,6 @@ char ***set_commands(int cmds_count, char **cmds, char **envp) // chaque cmds[i]
 {
     char ***commands;
     int i;
-    int j;
     
     i = 0;
     commands = malloc(sizeof(char **) * (cmds_count + 1));
@@ -95,7 +96,6 @@ char ***set_commands(int cmds_count, char **cmds, char **envp) // chaque cmds[i]
             commands[i] = ft_split(cmds[i], ' '); // command is null-terminated
             if (!commands[i])
                 return (perror("ft_split "), free_commands(commands), NULL);
-            j = 0;
             commands[i][0] = get_path(commands[i][0], envp);
         }
         else

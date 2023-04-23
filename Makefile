@@ -6,7 +6,7 @@
 #    By: Helene <Helene@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/07 19:48:12 by Helene            #+#    #+#              #
-#    Updated: 2023/04/18 23:29:59 by Helene           ###   ########.fr        #
+#    Updated: 2023/04/21 13:39:58 by Helene           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = pipex
 NAME_BONUS = pipex_bonus
 CC = cc
 RM = rm -f
-CFLAGS = -g3 #-fsanitize=address 
+CFLAGS = -Wall -Wextra -Werror -g3 #-fsanitize=address 
 
 LIBFTDIR = ./mylibft
 LIBFT = ./mylibft/libft.a
@@ -28,12 +28,12 @@ OBJSDIR = ./objs/
 INC_FILES = pipex.h get_next_line.h pipex_bonus.h
 INCS = $(addprefix $(INCSDIR), $(INC_FILES))
 
-SRCS = 			main.c set_execve_args.c \
-				mandatory_utils.c pipe_fork_exec.c utils.c \
+SRCS = 			main.c set_execve_args.c pipe_fork_exec.c \
+				mandatory_utils.c utils.c heap_utils.c \
 				get_next_line.c get_next_line_utils.c
 		
-SRCS_BONUS = 	main_bonus.c set_execve_args.c \
-				here_doc.c pipe_fork_exec.c utils.c \
+SRCS_BONUS = 	main_bonus.c set_execve_args.c pipe_fork_exec.c \
+				here_doc.c utils.c heap_utils.c \
 				get_next_line.c get_next_line_utils.c
 		
 OBJS = $(addprefix $(OBJSDIR), $(SRCS:.c=.o))

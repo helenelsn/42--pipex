@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 20:06:49 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/18 23:12:01 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/20 23:38:53 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h> // for perror()
+#include <stdlib.h> // defines EXIT_FAILURE and EXIT_SUCCESS
 
 #include "libft.h"
 #include "get_next_line.h"
@@ -39,6 +40,8 @@ void    open_pipe(t_fork_data *data, int i);
 void    pipe_fork_exec(t_fork_data *data, char **envp, int pids_nb);
 void    child_process(char **envp, t_fork_data *data, int i);
 void    f_close(int fd);
+int     f2_close(int fd);
+void    f_dup2(int fd1, int fd2);
 void    free_commands(char ***commands);
 void    free_tab(char **tab);
 

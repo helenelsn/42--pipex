@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 23:11:07 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/18 23:11:34 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/20 23:14:27 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void    initialise_data(t_fork_data *data, char **argv, int last)
     if (data->in_out[1] == -1)
     {
         perror("open ");
-        f_close(data->in_out[0]);
+        f2_close(data->in_out[0]);
         unlink(argv[1]);
         unlink(argv[last]);
         exit(4);

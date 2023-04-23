@@ -6,7 +6,7 @@
 /*   By: Helene <Helene@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:07:03 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/18 23:29:08 by Helene           ###   ########.fr       */
+/*   Updated: 2023/04/20 23:14:36 by Helene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int test_here_doc(char *arg1, char *limiter, int *in)
     if (infile == -1)
     {
         perror("open");
-        exit(-1); // ? 
+        exit(EXIT_FAILURE);
     }
     return (get_input(limiter, in, infile));
 }
@@ -85,7 +85,7 @@ void    here_doc_case(t_fork_data *data, char **argv, int last)
     if (data->in_out[1] == -1)
     {
         perror("open ");
-        f_close(data->in_out[0]);
+        f2_close(data->in_out[0]);
         unlink("here_doc");
         unlink(argv[last]);
         exit(4);
@@ -109,7 +109,7 @@ void    no_here_doc_case(t_fork_data *data, char **argv, int last)
     if (data->in_out[1] == -1)
     {
         perror("open ");
-        f_close(data->in_out[0]);
+        f2_close(data->in_out[0]);
         unlink(argv[1]);
         unlink(argv[last]);
         exit(4);
