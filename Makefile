@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: Helene <Helene@student.42.fr>              +#+  +:+       +#+         #
+#    By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/07 19:48:12 by Helene            #+#    #+#              #
-#    Updated: 2023/04/21 13:39:58 by Helene           ###   ########.fr        #
+#    Updated: 2023/04/24 02:10:03 by hlesny           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,8 +45,7 @@ export LIBRARY_PATH = $(LIBFTDIR)
 all : $(LIBS) $(NAME) # !!!!!!! modifier un fichier de la libft n'est pas détecté (nothing to make for all quand retape make)
 
 $(NAME) : $(OBJS)
-	$(CC) -no-pie -o $@ $^ $(LIBFT) 
-# enlever le -no-pie ?
+	$(CC) -o $@ $^ $(LIBFT) 
 
 $(LIBS) :
 	make -C $(LIBFTDIR)
@@ -60,7 +59,6 @@ $(OBJSDIR)%.o: $(SRCSDIR)%.c $(INCS)
 	mkdir -p $(OBJSDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# pourquoi $(RM) $(OBJS) -r $(OBJSDIR) (ie les deux sur la meme ligne) ne marche pas ? 
 clean :
 	$(RM) $(OBJS) $(OBJS_BONUS)
 	$(RM) -r $(OBJSDIR)

@@ -6,7 +6,7 @@
 /*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 15:56:24 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/23 23:52:03 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/24 01:45:13 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc < 5)
 		return (ft_putstr_fd("Not enough arguments in command line!\n",
-		            STDERR_FILENO), 5);
+				STDERR_FILENO), 5);
 	if (!envp)
 		return (6);
 	here_doc = test_here_doc(argv[1], argv[2], &data.in_out[0]);

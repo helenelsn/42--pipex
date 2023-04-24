@@ -6,7 +6,7 @@
 /*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 15:56:15 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/23 22:33:07 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/24 01:41:34 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_fork_data	data;
 
-	if (argc < 5)
+	if (argc != 5)
 	{
-		ft_putstr_fd("Not enough arguments in command line!\n", STDERR_FILENO);
+		ft_putstr_fd("Must have 5 arguments in command line!\n", STDERR_FILENO);
 		return (5);
 	}
 	if (!envp)

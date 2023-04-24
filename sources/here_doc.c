@@ -6,15 +6,13 @@
 /*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 17:07:03 by hlesny            #+#    #+#             */
-/*   Updated: 2023/04/24 01:10:19 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/24 01:30:29 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	contains_limiter(char *line, char *limiter) // returns
-												//-1 if line doesn't contain it,
-												//and the index of the limiter in line if it does
+int	contains_limiter(char *line, char *limiter)
 {
 	int	i;
 	int	j;
@@ -33,7 +31,6 @@ int	contains_limiter(char *line, char *limiter) // returns
 			j++;
 		}
 		if (!limiter[j])
-			// ie si est sorti du while en ayant entièrement parcouru limiter
 			return (i);
 		if (line[i])
 			i++;

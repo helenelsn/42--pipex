@@ -6,7 +6,7 @@
 /*   By: hlesny <hlesny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/01 02:31:34 by Helene            #+#    #+#             */
-/*   Updated: 2023/04/24 00:13:16 by hlesny           ###   ########.fr       */
+/*   Updated: 2023/04/24 02:32:41 by hlesny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	open_pipe(t_fork_data *data, int i)
 			f_close(data->pipefd[0]);
 			f_close(data->pipefd[1]);
 		}
-		if (pipe(data->pipefd) == -1) // pipefd[0] -- read // pipefd[1] : write
+		if (pipe(data->pipefd) == -1)
 		{
 			perror("pipe");
 			exit(3);
@@ -30,14 +30,14 @@ void	open_pipe(t_fork_data *data, int i)
 		if (data->pipefd[0] < 0 || data->pipefd[1] < 0)
 		{
 			write(2, "Error : open_pipe() : invalid file\n", 35);
-			exit(EXIT_FAILURE); // ?
+			exit(EXIT_FAILURE);
 		}
 	}
 }
 
-void	child_process(char **envp, t_fork_data *data, int i)
+void	child_process(char **envp, t_fork_data *data, int i, int *pid)
 {
-	if (i == data->processes_nb - 1) // we want to write in the outfile, rather than in pipefd[1]
+	if (i == data->processes_nb - 1)
 	{
 		f_close(data->pipefd[1]);
 		f_dup2(data->pipefd[0], STDIN_FILENO);
@@ -51,23 +51,25 @@ void	child_process(char **envp, t_fork_data *data, int i)
 	}
 	if (execve(data->commands[i][0], data->commands[i], envp) == -1)
 	{
-		fprintf(stderr, "%s : ", data->commands[i][0]);
-			// le remplacer par mon printf a moi
+		ft_putstr_fd(data->commands[i][0], STDERR_FILENO);
+		ft_putstr_fd(" : ", STDERR_FILENO);
 		perror("execve ");
 		free_commands(data->commands);
+		free(pid);
 		exit(3);
 	}
 	exit(0);
-		// we only want to fork in the parent process ; we therefore terminate each child process after they executed their assignated command,
-	//or else they would stay in the while loop and create child processes of their own as well
 }
 
 void	pipe_fork_exec(t_fork_data *data, char **envp, int pids_nb)
 {
-	int	pid[pids_nb];
-	int	i;
+	pid_t	*pid;
+	int		i;
 
 	i = -1;
+	pid = malloc(sizeof(int) * (pids_nb));
+	if (!pid)
+		return ;
 	while (++i < data->processes_nb)
 	{
 		open_pipe(data, i);
@@ -75,7 +77,7 @@ void	pipe_fork_exec(t_fork_data *data, char **envp, int pids_nb)
 		if (pid[i] == -1)
 			perror("fork ");
 		if (pid[i] == 0)
-			child_process(envp, data, i);
+			child_process(envp, data, i, pid);
 	}
 	f_close(data->pipefd[0]);
 	f_close(data->pipefd[1]);
@@ -85,4 +87,5 @@ void	pipe_fork_exec(t_fork_data *data, char **envp, int pids_nb)
 		if (waitpid(pid[i], &data->wstatus, 0) == -1)
 			perror("waitpid ");
 	}
+	free(pid);
 }
